@@ -1,6 +1,30 @@
+import React from 'react';
 import { graphql } from 'gatsby';
 
-export { default } from './PostListLayoutComponent';
+import Post from 'components/Post';
+
+export default ({ data }) => {
+  const {
+    allMdx: { edges },
+  } = data;
+
+  return edges.map(({ node }) => {
+    const { excerpt, fields, frontmatter, timeToRead, headings } = node;
+    const { slug } = fields;
+    const { date } = frontmatter;
+    const firstHeading = headings[0] && headings[0].value;
+
+    return (
+      <Post
+        href={slug}
+        heading={firstHeading}
+        excerpt={excerpt}
+        timeToRead={timeToRead}
+        date={date}
+      />
+    );
+  });
+};
 
 export const pageQuery = graphql`
   query($skip: Int!, $limit: Int!) {
