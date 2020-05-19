@@ -50,6 +50,7 @@
     "eslint-config-react-app": "^5.0.2",
     "eslint-loader": "^3.0.2",
     "gatsby-plugin-eslint": "^2.0.8",
+    "gh-pages": "^2.2.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
@@ -62,6 +63,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0",
+    "deploy": "gatsby build && gh-pages -d public -b master",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
