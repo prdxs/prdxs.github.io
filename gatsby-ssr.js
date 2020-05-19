@@ -4,4 +4,5 @@
  * See: https://www.gatsbyjs.org/docs/ssr-apis/
  */
 
-// You can delete this file if you're not using it
+// Import programming language syntax highlighting theme
+require("prismjs/themes/prism-tomorrow.css");

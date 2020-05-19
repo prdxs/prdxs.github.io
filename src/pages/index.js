@@ -1,21 +1,21 @@
-import React from "react"
-import { Link } from "gatsby"
+import React from 'react';
+import styled from 'styled-components';
 
-import Layout from "../components/layout"
-import Image from "../components/image"
-import SEO from "../components/seo"
+import Seo from 'components/Seo';
+import Link from 'components/Link';
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link>
-  </Layout>
-)
+const Intro = styled.div`
+  font-size: 1.6rem;
+`;
 
-export default IndexPage
+const AboutPage = () => (
+  <Intro>
+    <Seo title="About" description="." />
+    <p>Hi, I’m Rubén Fernández Butrón,</p>
+    <p>Software Engineer at Ascend Diagnostics, Manchester, UK. I build web frontend systems using Javascript and React.</p>
+    <p>Currently, I want to learn more on backend systems, data science and web design but I am also interested in philosophy, music and science in general.</p>
+    <p><Link to="mailto:rub.fndz@gmail.com">Get in touch.</Link></p>
+  </Intro>
+);
+
+export default AboutPage;

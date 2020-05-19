@@ -1,0 +1,55 @@
+---
+  date: 2019-12-20
+  title: Post 1
+  seo:
+    title: Post 1
+    description: Post 1
+---
+
+# Post 1
+
+Hi there
+![Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut sem nulla pharetra diam sit. Purus semper eget duis at tellus at urna condimentum mattis. Nulla aliquet enim tortor at auctor urna. Amet commodo nulla facilisi nullam vehicula ipsum. Fringilla est ullamcorper eget nulla facilisi. Sagittis orci a scelerisque purus semper eget duis. Consectetur adipiscing elit duis tristique sollicitudin nibh. Nunc sed blandit libero volutpat sed cras ornare arcu dui. Blandit cursus risus at ultrices mi tempus imperdiet nulla malesuada. Massa tincidunt nunc pulvinar sapien et ligula. Dui sapien eget mi proin sed libero enim sed faucibus. Nec feugiat nisl pretium fusce id velit ut. Posuere morbi leo urna molestie. Ipsum a arcu cursus vitae congue mauris rhoncus aenean. Urna neque viverra justo nec. Quis blandit turpis cursus in hac. Ornare lectus sit amet est placerat in egestas.](./64491365_10157722384298646_7522837219845865472_o.jpg)
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut sem nulla pharetra diam sit. Purus semper eget duis at tellus at urna condimentum mattis. Nulla aliquet enim tortor at auctor urna. Amet commodo nulla facilisi nullam vehicula ipsum. Fringilla est ullamcorper eget nulla facilisi. Sagittis orci a scelerisque purus semper eget duis. Consectetur adipiscing elit duis tristique sollicitudin nibh. Nunc sed blandit libero volutpat sed cras ornare arcu dui. Blandit cursus risus at ultrices mi tempus imperdiet nulla malesuada. Massa tincidunt nunc pulvinar sapien et ligula. Dui sapien eget mi proin sed libero enim sed faucibus. Nec feugiat nisl pretium fusce id velit ut. Posuere morbi leo urna molestie. Ipsum a arcu cursus vitae congue mauris rhoncus aenean. Urna neque viverra justo nec. Quis blandit turpis cursus in hac. Ornare lectus sit amet est placerat in egestas.
+
+```jsx
+class FlavorForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: 'coconut'};
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    alert('Your favorite flavor is: ' + this.state.value);
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Pick your favorite flavor:
+          <select value={this.state.value} onChange={this.handleChange}>
+            <option value="grapefruit">Grapefruit</option>
+            <option value="lime">Lime</option>
+            <option value="coconut">Coconut</option>
+            <option value="mango">Mango</option>
+          </select>
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut sem nulla pharetra diam sit. Purus semper eget duis at tellus at urna condimentum mattis. Nulla aliquet enim tortor at auctor urna. Amet commodo nulla facilisi nullam vehicula ipsum. Fringilla est ullamcorper eget nulla facilisi. Sagittis orci a scelerisque purus semper eget duis. Consectetur adipiscing elit duis tristique sollicitudin nibh. Nunc sed blandit libero volutpat sed cras ornare arcu dui. Blandit cursus risus at ultrices mi tempus imperdiet nulla malesuada. Massa tincidunt nunc pulvinar sapien et ligula. Dui sapien eget mi proin sed libero enim sed faucibus. Nec feugiat nisl pretium fusce id velit ut. Posuere morbi leo urna molestie. Ipsum a arcu cursus vitae congue mauris rhoncus aenean. Urna neque viverra justo nec. Quis blandit turpis cursus in hac. Ornare lectus sit amet est placerat in egestas.
