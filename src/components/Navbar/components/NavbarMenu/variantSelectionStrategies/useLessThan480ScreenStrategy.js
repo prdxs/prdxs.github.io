@@ -16,7 +16,7 @@ const useLessThan480ScreenStrategy = () => {
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
-    handleResize();
+    setIsLessThan480(getScreenWidth() < 480);
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
 
