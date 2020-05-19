@@ -4,7 +4,7 @@ import debounce from 'utils/debounce';
 import getScreenWidth from 'utils/getScreenWidth';
 
 const useLessThan480ScreenStrategy = () => {
-  const [isLessThan480, setIsLessThan480] = useState(getScreenWidth() < 480);
+  const [isLessThan480, setIsLessThan480] = useState(0);
 
   const handleResize = useCallback(
     debounce(200, () => {
@@ -16,6 +16,7 @@ const useLessThan480ScreenStrategy = () => {
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
+    handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
 
