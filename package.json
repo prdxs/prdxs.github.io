@@ -1,5 +1,5 @@
 {
-  "name": "@prdxs/prdxs.github.io",
+  "name": "@prdxs/website",
   "description": "prdxs' website",
   "version": "1.0.0",
   "author": "Rubén Fernández-Butrón <rub.fndz@gmail.com>",
@@ -62,7 +62,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0",
-    "deploy": "gatsby build && gh-pages -d public -b gh-pages",
+    "deploy": "gatsby build && gh-pages -d public -b master -r prdxs/prdxs.github.io",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
