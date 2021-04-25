@@ -26,8 +26,8 @@ const BaseLayoutComponent = ({ children, themeMode }) => (
     <CssBaseline />
     <Container>
       <Navbar>
-        <NavbarLink to="/">About</NavbarLink>
-        <NavbarLink to="/posts">Posts</NavbarLink>
+        <NavbarLink href="/">About</NavbarLink>
+        <NavbarLink href="/posts">Posts</NavbarLink>
       </Navbar>
       <Main>{children}</Main>
     </Container>

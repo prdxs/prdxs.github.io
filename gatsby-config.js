@@ -6,7 +6,7 @@ const gatsbyRemarkImagesPlugin = {
     maxWidth: 756,
     linkImagesToOriginal: false,
     showCaptions: ['title', 'alt'],
-    markdownCaptions: true,
+    markdownCaptions: false,
   },
 };
 

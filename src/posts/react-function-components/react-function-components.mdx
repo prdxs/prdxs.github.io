@@ -1,0 +1,577 @@
+---
+  date: 2020-04-25
+  title: React Function Components
+  seo:
+    title: React Function Components
+    description: Difference between Class and Function components
+---
+
+# React Function Components
+
+![Photo by veeterzy on Unsplash](./veeterzy-tree.jpg)
+
+This post was made for developers that have certain experience building Class Components but might not have found the
+time to learn Function Components and the Hooks API, or that just want to learn more about the differences and
+similarities between the two.
+
+*If you are starting from scratch I would suggest that you head to the
+[official documentation](https://reactjs.org/docs/getting-started.html).*
+
+## Introduction
+
+React helps us to build UIs by creating reusable components like buttons or text fields, then composing a tree of the
+nodes of which are instances of those components and, finally, rendering that tree.
+
+The browser works in a similar way. When an HTML document is loaded, the rendering engine parses the HTML and converts
+the elements to DOM nodes and puts them in a tree called the Content Tree and renders it.
+
+React run-time works on top of the browser operations on the DOM by creating an in-memory representation of the tree of
+elements and using a diffing algorithm to reconcile that representation with the DOM every time there is an update in
+the tree. That in-memory representation is called the Virtual DOM.
+
+**What are the advantages of using React?** Firstly, React's diffing algorithm on the Virtual DOM is super fast and
+only the strictly necessary changes are committed to the sluggish HTML DOM and, secondly, React Components have a rich
+API with which we can tap to different moments in the lifecycle of a component or update its internal state.
+
+![React's diffing algorithm](./auth0-react-diffing-algorithm.png)
+
+*All credits of this image go for Auth0 and Sebastian Peyrott who wrote
+[this article](https://auth0.com/blog/face-off-virtual-dom-vs-incremental-dom-vs-glimmer/)
+on the performance of different virtual DOMs implemented in different UI rendering libraries.*
+
+### React components
+
+Historically, Function Components were relegated to Stateless Components without any internal state or lifecycle logic.
+
+```jsx
+function StatelessButton({ className, size, color, children }) {
+  const style = {
+    backgroundColor: color,
+    padding: sizeToPadding[size],
+    fontSize: sizeToFontSize[size],
+  };
+  return (
+    <button className={clsx('StatelessButton', className)} style={style}>
+      {children}
+    </button>
+  );
+}
+```
+
+If you wanted to have an internal state to keep track of the number of clicks to the button, you would have to use a
+Class Component.
+
+```jsx
+class ClicksButton extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clicks: 0,
+    };
+  }
+  handleClick = () => {
+    this.setState(({ clicks }) => ({
+      clicks: clicks + 1,
+    }));
+  };
+  render() {
+    const { className, style } = this.props;
+    const { clicks } = this.state;
+    return (
+      <button
+        className={clsx('ClicksButton', className)}
+        style={style}
+        onClick={this.handleClick}
+      >
+        Clicks {clicks}
+      </button>
+    );
+  }
+}
+```
+
+Luckily enough for us, the scene changed when Facebook released React 16.8 in February 2019 packed with a new API to
+hook into lifecycle events and internal state using function components. Enter React Hooks.
+
+```jsx
+function ClicksButton({ className, style }) {
+  const [clicks, setClicks] = useState(0);
+  const handleClick = useCallback(() => setClicks((clicks) => clicks + 1), []);
+  return (
+    <button
+      className={clsx('ClicksButton', className)}
+      style={style}
+      onClick={handleClick}
+    >
+      Clicks {clicks}
+    </button>
+  );
+}
+```
+
+## Lifecycle methods and internal state
+
+During its life, a component instance goes through three different phases: mounting, updating and un-mounting. At the
+same time, every render, whether it's the first, the last or one in between, goes through three different phases:
+render, pre-commit and commit.
+
+See [this amazing diagram](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/) to get a grasp of every step
+of React lifecycle.
+
+### Mounting
+
+Before rendering for the first time, components let us initialise the state, subscribe to data sources or set timers to
+name a few.
+
+Let's see how we can write a Class Component that initialises a clock and sets an interval to update the time.
+
+```jsx
+class Clock extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      time: new Date().toLocaleTimeString(),
+    };
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({ time: new Date().toLocaleTimeString() });
+    }, 1000);
+  }
+  render() {
+    const { className, style } = this.props;
+    const { time } = this.state;
+    return (
+      <span
+        className={clsx('Clock', className)}
+        style={style}
+      >
+        {time}
+      </span>
+    );
+  }
+}
+```
+
+As you can see here we're are initialising the state in the constructor and then we are using the lifecycle method
+***componentDidMount*** to set the interval that updates the time every second. ***componentDidMount*** will only ever
+be called once in the life of a component, just before rendering for the first time.
+
+Now, what does that look like when using Function Components and Hooks?
+
+Here, the ***useEffect*** hook is replacing the ***componentDidMount*** lifecycle method. Notice how ***useEffect***
+receives a function as the first argument and an array as the second. As for ***useState***, it replaces the state
+initialisation we had in the constructor of our Class Component. Only here, the initial value is not assigned to
+***this.state***, instead, it is passed as the only argument to ***useState***.
+
+There is a big difference in the way the state is updated too. With Class Components, we use ***this.setState*** and the
+state is a map of key-value pairs. On the other hand, useState returns us an array with the current value of the state
+as the first item and a setter for that value as the second. That setter is what we use to update the value.
+
+Several built-in hooks receive a callback function for us to put some logic as the first argument and the dependencies
+list that indicates to which variables the callback logic depends on as the second. In this case, our interval logic
+doesn't depend on any variable, thus we pass an empty dependencies list.
+
+### Updating
+
+Let's add some functionality to our clock so that we can stop it with the click of a button.
+
+```jsx
+class StoppableClock extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      time: new Date().toLocaleTimeString(),
+      isRunning: true,
+    };
+  }
+  componentDidMount() {
+    this.intervalId = setInterval(() => {
+      this.setState({ time: new Date().toLocaleTimeString() });
+    }, 1000);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // Stopping clock
+    if (prevState.isRunning && !this.state.isRunning) {
+      clearInterval(this.intervalId);
+    }
+    // Re-starting clock
+    if (!prevState.isRunning && this.state.isRunning) {
+      this.intervalId = setInterval(() => {
+        this.setState({ time: new Date().toLocaleTimeString() });
+      }, 1000);
+    }
+  }
+  toggle = () => {
+    this.setState(({ isRunning }) => ({ isRunning: !isRunning }));
+  }
+  render() {
+    const { className, style } = this.props;
+    const { time } = this.state;
+    return (
+      <div className={clsx('StoppableClock', className)} style={style}>
+        <span className="StoppableClock-time">{time}</span>
+        <button className="StoppableClock-button" onClick={this.toggle}>Toggle</button>
+      </div>
+    );
+  }
+}
+```
+
+We've added several things to make our clock stoppable:
+ * A new state boolean attribute called ***isRunning*** indicating whether the clock should be running or not,
+ initialised to ***true***.
+ * A button hooked to an event listener to toggle ***isRunning*** between ***true*** or ***false***.
+ * And a ***componentDidUpdate*** lifecycle method call to act on the ***isRunning*** state change and stop or restart
+ the clock.
+
+As you can see, in the Class Component, ***componentDidUpdate*** is called immediately after updating occurs. This
+creates an opportunity for us to act upon any props or state changes (updating the DOM, retrieving data, etc). In this
+case, we are stopping or restarting the interval that updates the time. So, we are basically undoing what we set in
+componentDidMount and then setting it all again depending on which conditions on the previous and current state are met.
+
+Let's see how we solve the same problem in a Function Component.
+
+```jsx
+function StoppableClock({ className, style }) {
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+  const [isRunning, setIsRunning] = useState(true);
+  const toggle = useCallback(() => {
+    setIsRunning(isRunning => !isRunning);
+  }, []);
+  useEffect(() => {
+    if (isRunning) {
+      const intervalId = setInterval(() => {
+        setTime(new Date().toLocaleTimeString());
+      }, 1000);
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [isRunning]);
+  return (
+    <div className={clsx('StoppableClock', className)} style={style}>
+      <span className="StoppableClock-time">{time}</span>
+      <button className="StoppableClock-button" onClick={toggle}>Toggle</button>
+    </div>
+  );
+}
+```
+
+Here, firstly, our ***isRunning*** state is added as a separate piece of state with its individual value and setter.
+
+As a rule of thumb, it's good to group pieces of state in a map if they affect the same UI effect.
+
+```js
+// Example
+const [style, setStyle] = useState({
+  color: 'red',
+  width: '100px'
+});
+```
+
+Secondly, we've used the ***useCallback*** hook to create the event listener to stop or resume the clock every time we
+click on the new button. Notice how we are using our state setter ***setIsRunning*** inside the callback and how,
+instead of a value, as we did for ***setTime***, we are passing a function updater as its argument, not unlike we did
+for the Class Component.
+
+```js
+const toggle = useCallback(() => {
+  setIsRunning(isRunning => !isRunning);
+}, []);
+```
+
+Instead, we could define our handler as follows.
+
+```js
+const toggle = useCallback(() => {
+  setIsRunning(!isRunning);
+}, [isRunning]);
+```
+
+But that would have two disadvantages:
+ * We would have to provide ***isRunning*** in the dependencies list or else the callback would get stuck with the
+ state value of the stale closure from the first render (check
+ [this article](https://www.netlify.com/blog/2019/03/11/deep-dive-how-do-react-hooks-really-work/) by Netlify to know
+ more).
+ * And, as we are adding ***isRunning*** to the dependency list, every time ***isRunning*** would change, a new
+ reference to the ***toggle*** handler would be created, thus forcing the re-render of the button receiving
+ ***toggle*** as the value for the ***onClick*** prop.
+
+And lastly, we've added a couple of things to our ***useEffect*** hook. Now we set the interval only if ***isRunning***
+is ***true***. And, also, we are returning a callback function from within the if statement. That callback function is
+what in React Hooks lingo is called a clean-up function and it does what it says, it cleans up whatever we've set in the
+***useEffect*** callback; in this case, the interval. In other words, the ***useEffect*** hook along with its clean-up
+function replaces the ***componentDidUpdate*** lifecycle methods of Class Components in a very convenient way.
+
+```js
+useEffect(() => {
+  if (isRunning) {
+    const intervalId = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }
+}, [isRunning]);
+```
+
+### Unmounting
+
+As you may have noticed, we've purposely left out the necessary logic to properly unmount the Class Component. What
+happens with that interval if the component gets unmounted from the DOM when the interval is still running? Well, then
+we have a callback that is setting a time state of a component instance that is not mounted anymore thus we have a
+memory leak (this great
+[Egghead video](https://egghead.io/lessons/react-stop-memory-leaks-with-componentwillunmount-lifecycle-method-in-react)
+showcases the issue). Let's fix it!
+
+```jsx
+
+class StoppableClock extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      time: new Date().toLocaleTimeString(),
+      isRunning: true,
+    };
+  }
+  componentDidMount() {
+    this.intervalId = setInterval(() => {
+      this.setState({ time: new Date().toLocaleTimeString() });
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.intervalId);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // Stopping clock
+    if (prevState.isRunning && !this.state.isRunning) {
+      clearInterval(this.intervalId);
+    }
+    // Re-starting clock
+    if (!prevState.isRunning && this.state.isRunning) {
+      this.intervalId = setInterval(() => {
+        this.setState({ time: new Date().toLocaleTimeString() });
+      }, 1000);
+    }
+  }
+  toggle = () => {
+    this.setState(({ isRunning }) => ({ isRunning: !isRunning }));
+  }
+  render() {
+    const { className, style } = this.props;
+    const { time } = this.state;
+    return (
+      <div className={clsx('StoppableClock', className)} style={style}>
+        <span className="StoppableClock-time">{time}</span>
+        <button className="StoppableClock-button" onClick={this.toggle}>Toggle</button>
+      </div>
+    );
+  }
+}
+```
+
+Now we are clearing the interval whenever the component is unmounted by using the ***componentWillUnmount*** lifecycle
+method. So, how do we do that in the case of Function Components? Well, we already did:
+
+```js
+useEffect(() => {
+  if (isRunning) {
+    const intervalId = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }
+}, [isRunning]);
+```
+
+As the clean-up function is called every render, we don't need to care about any specific logic to unmount the
+component. As you can see, all three lifecycles we've seen, ***componentDidMount***, ***componentDidUpdate*** and
+***componentWillUnmount***, are synthesized by the ***useEffect*** hook and its clean-up function. This is commonly the
+case. It's very rare to find a component needing an unmounting logic that does not go accompanied by its counterpart
+mounting and updating logic.
+
+## Avoiding unnecessary re-renders
+
+React is fast and React devs don't usually need to care about re-renders. But if you have ever developed a heavy
+component you might have taken the hard path of avoiding unnecessary re-renders with the help of console logs,
+debuggers and the React Profiler. Let's go back to the ***ClicksButton*** component and see how we can optimise it.
+
+```jsx
+class ClicksButton extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clicks: 0,
+    };
+  }
+  handleClick = () => {
+    this.setState(({ clicks }) => ({
+      clicks: clicks + 1,
+    }));
+  };
+  render() {
+    const { className, style } = this.props;
+    const { clicks } = this.state;
+    return (
+      <button
+        className={clsx('ClicksButton', className)}
+        style={style}
+        onClick={this.handleClick}
+      >
+        Clicks {clicks}
+      </button>
+    );
+  }
+}
+```
+
+What happens if the ClicksButton's parent node re-renders for some reason but it provides our instance with the same
+props (***className***, ***style*** and ***children***)? Our component would be forced to re-render because there are
+no checks in place to determine whether the props are the same or not.
+
+Class Components give us the ***shouldComponentUpdate*** lifecycle method to bail out of re-rendering. It receives the
+next props as the first argument and the next state as the second. And that's all we need.
+
+```jsx
+class PerfClicksButton extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clicks: 0,
+    };
+  }
+  shouldComponentUpdate(nextProps, nextState) {
+    const sameClassName = nextProps.className === this.props.className;
+    const sameStyle = nextProps.style === this.props.style;
+    const sameChildren = nextProps.children === this.props.children;
+    const sameClicks = nextState.clicks === this.state.clicks;
+    if (sameClassName && sameStyle && sameChildren && sameClicks) {
+      return false;
+    }
+    return true;
+  }
+  handleClick = () => {
+    this.setState(({ clicks }) => ({
+      clicks: clicks + 1,
+    }));
+  };
+  render() {
+    const { className, style, children } = this.props;
+    const { clicks } = this.state;
+    return (
+      <button
+        className={clsx('ClicksButton', className)}
+        style={style}
+        onClick={this.handleClick}
+      >
+        {children} {clicks}
+      </button>
+    );
+  }
+}
+```
+
+As you can see in that very ugly ***shouldComponentUpdate*** we are shallowly comparing all three props and, also, the
+state clicks. If all of those are the same as before we return ***false*** and stop the rendering process.
+
+If we are only doing shallow comparisons of previous and next props and state, React gives us a very handy class that
+implements the ***shouldComponentUpdate*** method for us that we can use in place of ***Component***. It's called
+***PureComponent***.
+
+```jsx
+class PerfClicksButton extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clicks: 0,
+    };
+  }
+  handleClick = () => {
+    this.setState(({ clicks }) => ({
+      clicks: clicks + 1,
+    }));
+  };
+  render() {
+    const { className, style, children } = this.props;
+    const { clicks } = this.state;
+    return (
+      <button
+        className={clsx('ClicksButton', className)}
+        style={style}
+        onClick={this.handleClick}
+      >
+        {children} {clicks}
+      </button>
+    );
+  }
+}
+```
+
+So, how do we avoid unnecessary re-renders on Function Components? React provides us with a function to cache the
+result of our Function Components and return the same result if the same props are provided to the component. That
+function is called ***memo*** and it receives our Function Component as the first argument. See how we can accomplish
+the same results with it.
+
+```jsx
+const PerfClicksButton = memo(({ className, style, children }) => {
+  const [clicks, setClicks] = useState(0);
+  const handleClick = useCallback(() => setClicks((clicks) => clicks + 1), []);
+  return (
+    <button
+      className={clsx('ClicksButton', className)}
+      style={style}
+      onClick={handleClick}
+    >
+      {children} {clicks}
+    </button>
+  );
+});
+```
+
+## Custom hooks
+
+**So what?** You may argue… It's clear that writing Function Components using Hooks entails a lot of learning: new API,
+new ways of working, syntax might not be that clear as hooks are juggling with closures in a way that is not
+immediately evident, etc.
+
+Well, the main advantage of Function Components over Class Components besides the unification of the
+mount/update/unmount logic with ***useEffect*** is the possibility to create new hooks, functions that you can directly
+use in your Function Components and that might be as simple or as complex as you may need. Let's see an example.
+
+```jsx
+export default function useData(initData) {
+  const [data, setData] = useState(initData);
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      const newData = await fetch('https://data-api.com/getData').then(response => response.json());
+      setData(newData);
+    }, 50000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+  return data;
+}
+```
+
+In this simple hook, we are retrieving data from an endpoint and setting an interval to get fresh data every 50 seconds.
+This hook can be used in any Function Component.
+
+## Conclusions
+
+Before finishing I would like to emphasise that although I am very biased towards the use of Functional Components I
+recognise refactoring perfectly working Class Components into Functional Components just because they are the new
+shiny thing might not be a very good thing to do from the business perspective, or the engineering perspective for that
+matter.
+
+**Take-aways:**
+ * Function Components with Hooks are quite a re-vamp of the way we used to work when writing Class Component and it
+ might be difficult to make the switch.
+ * The API for dealing with mounting, updating and unmounting logic is much more synthetic with ***useEffect***.
+ * Everything you do with Class Components can be done with Hooks.
+ * You can encapsulate logic in custom hooks and re-use it in as many components as you wish in a very direct manner.
+ * You'll probably save some lines of code if you go functional.

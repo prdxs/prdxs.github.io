@@ -35,7 +35,7 @@ const PostComponent = ({ href, heading, excerpt, date, timeToRead }) => (
   <Post>
     <header>
       <PostHeading>
-        <Link to={href}>{heading}</Link>
+        <Link href={href}>{heading}</Link>
       </PostHeading>
       <PostMeta>
         <small>
