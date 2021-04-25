@@ -10,10 +10,16 @@ const Intro = styled.div`
 
 const AboutPage = () => (
   <Intro>
-    <Seo title="About" description="." />
-    <p>Hi, I’m Rubén Fernández Butrón,</p>
-    <p>Software Engineer at Ascend Diagnostics, Manchester, UK. I build web frontend systems using Javascript and React.</p>
-    <p>Currently, I want to learn more on backend systems, data science and web design but I am also interested in philosophy, music and science.</p>
+    <Seo title="About" description="Hi, Software Engineer" />
+    <p>Hi, I’m Rubén Fernández-Butrón.</p>
+    <p>
+      I'm building web frontend apps using Typescript and React and APIs using Typescript Node, Express
+      and AWS services at <Link href="https://www.missguided.co.uk/">Missguided</Link>.
+    </p>
+    <p>
+      Currently, I want to learn more on backend systems, data science and web design but I am also
+      interested in music and science.
+    </p>
     <p><Link href="mailto:rub.fndz@gmail.com">Get in touch.</Link></p>
   </Intro>
 );
