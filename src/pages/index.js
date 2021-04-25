@@ -14,7 +14,7 @@ const AboutPage = () => (
     <p>Hi, I’m Rubén Fernández Butrón,</p>
     <p>Software Engineer at Ascend Diagnostics, Manchester, UK. I build web frontend systems using Javascript and React.</p>
     <p>Currently, I want to learn more on backend systems, data science and web design but I am also interested in philosophy, music and science.</p>
-    <p><Link to="mailto:rub.fndz@gmail.com">Get in touch.</Link></p>
+    <p><Link href="mailto:rub.fndz@gmail.com">Get in touch.</Link></p>
   </Intro>
 );
 

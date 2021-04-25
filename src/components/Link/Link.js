@@ -6,25 +6,24 @@ const externalHttpLink = /^(?:https?)?:\/\/.*/;
 const telLink = /^tel:.*/;
 const mailLink = /^mailto:.*/;
 
-const UnstyledLink = React.forwardRef(({ to, ...otherProps }, ref) => {
-  const isHttpExternal = externalHttpLink.test(to);
-  const isMail = mailLink.test(to);
-  const isTel = telLink.test(to);
+const UnstyledLink = React.forwardRef(({ href, ...otherProps }, ref) => {
+  const isHttpExternal = externalHttpLink.test(href);
+  const isMail = mailLink.test(href);
+  const isTel = telLink.test(href);
   const isExternal = isHttpExternal || isMail || isTel;
 
   const Component = isExternal ? 'a' : InternalLink;
 
   if (isExternal) {
-    otherProps.href = to;
     if (isHttpExternal || isMail) {
       otherProps.target = '_blank';
       otherProps.rel = 'noopener noreferrer';
     }
   } else {
-    otherProps.to = to;
+    otherProps.to = href;
   }
 
-  return <Component ref={ref} {...otherProps} />;
+  return <Component ref={ref} href={href} {...otherProps} />;
 });
 
 const colorStyleFn = ({
