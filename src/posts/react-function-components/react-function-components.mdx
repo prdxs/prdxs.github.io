@@ -19,7 +19,7 @@ similarities between the two.
 
 ## Introduction
 
-React helps us to build UIs by creating reusable components like buttons or text fields, then composing a tree of the
+React helps us to build UIs by creating reusable components like buttons or text fields, then composing a tree the
 nodes of which are instances of those components and, finally, rendering that tree.
 
 The browser works in a similar way. When an HTML document is loaded, the rendering engine parses the HTML and converts
@@ -91,7 +91,7 @@ class ClicksButton extends Component {
 ```
 
 Luckily enough for us, the scene changed when Facebook released React 16.8 in February 2019 packed with a new API to
-hook into lifecycle events and internal state using function components. Enter React Hooks.
+hook into lifecycle events and internal state using Function Components. Enter React Hooks.
 
 ```jsx
 function ClicksButton({ className, style }) {
@@ -111,12 +111,12 @@ function ClicksButton({ className, style }) {
 
 ## Lifecycle methods and internal state
 
-During its life, a component instance goes through three different phases: mounting, updating and un-mounting. At the
+During its life, a component instance goes through three different phases: mounting, updating and unmounting. At the
 same time, every render, whether it's the first, the last or one in between, goes through three different phases:
 render, pre-commit and commit.
 
 See [this amazing diagram](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/) to get a grasp of every step
-of React lifecycle.
+of React's lifecycle.
 
 ### Mounting
 
@@ -158,6 +158,25 @@ As you can see here we're are initialising the state in the constructor and then
 be called once in the life of a component, just before rendering for the first time.
 
 Now, what does that look like when using Function Components and Hooks?
+
+```jsx
+function Clock({ className, style }) {
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+  useEffect(() => {
+    setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+  }, []);
+  return (
+    <span
+      className={clsx('Clock', className)}
+      style={style}
+    >
+      {time}
+    </span>
+  );
+}
+```
 
 Here, the ***useEffect*** hook is replacing the ***componentDidMount*** lifecycle method. Notice how ***useEffect***
 receives a function as the first argument and an array as the second. As for ***useState***, it replaces the state
@@ -228,7 +247,7 @@ We've added several things to make our clock stoppable:
 As you can see, in the Class Component, ***componentDidUpdate*** is called immediately after updating occurs. This
 creates an opportunity for us to act upon any props or state changes (updating the DOM, retrieving data, etc). In this
 case, we are stopping or restarting the interval that updates the time. So, we are basically undoing what we set in
-componentDidMount and then setting it all again depending on which conditions on the previous and current state are met.
+***componentDidMount*** and then setting it all again depending on which conditions on the previous and current state are met.
 
 Let's see how we solve the same problem in a Function Component.
 
@@ -302,7 +321,7 @@ And lastly, we've added a couple of things to our ***useEffect*** hook. Now we s
 is ***true***. And, also, we are returning a callback function from within the if statement. That callback function is
 what in React Hooks lingo is called a clean-up function and it does what it says, it cleans up whatever we've set in the
 ***useEffect*** callback; in this case, the interval. In other words, the ***useEffect*** hook along with its clean-up
-function replaces the ***componentDidUpdate*** lifecycle methods of Class Components in a very convenient way.
+function replace the ***componentDidUpdate*** lifecycle method of Class Components in a very convenient way.
 
 ```js
 useEffect(() => {
@@ -476,7 +495,7 @@ class PerfClicksButton extends Component {
 ```
 
 As you can see in that very ugly ***shouldComponentUpdate*** we are shallowly comparing all three props and, also, the
-state clicks. If all of those are the same as before we return ***false*** and stop the rendering process.
+***clicks*** state. If all of those are the same as before we return ***false*** and stop the rendering process.
 
 If we are only doing shallow comparisons of previous and next props and state, React gives us a very handy class that
 implements the ***shouldComponentUpdate*** method for us that we can use in place of ***Component***. It's called
